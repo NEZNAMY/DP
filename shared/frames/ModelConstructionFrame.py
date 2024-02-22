@@ -13,10 +13,11 @@ from options import Options
 class ModelConstructionFrame:
 
     def __init__(self, parentFrame: Frame, modelFilePath: str, loadModel: Callable, createModel: Callable,
-                 allowBinary: bool):
+                 classCount: int):
         self.modelFilePath = modelFilePath
         self.loadModel = loadModel
         self.createModel = createModel
+        self.classCount = classCount
         self.constructionFrame = Frame(parentFrame)
         Options.instance.addFrame(self.constructionFrame)
         Label(self.constructionFrame, text="Construction menu", font=16).grid(row=0, column=0, columnspan=99)
@@ -42,7 +43,7 @@ class ModelConstructionFrame:
             'Categorical Crossentropy': 'categorical_crossentropy',
             'Sparse Categorical Crossentropy': 'sparse_categorical_crossentropy'
         }
-        if allowBinary:
+        if classCount == 2:
             self.lossFunctionNames["Binary Crossentropy"] = "binary_crossentropy"
 
         Label(self.createFrame, text="Loss function").grid(row=3, column=0)
@@ -91,21 +92,12 @@ class ModelConstructionFrame:
 
     def createNew(self):
         def create():
-            model = self.createModel()
-            metrics = None
-            if self.lossFunctionBox.get() == "Binary Crossentropy":
-                metrics = [
-                    tf.keras.metrics.BinaryCrossentropy(name='Accuracy'),
-                ]
-            elif self.lossFunctionBox.get() == "Categorical Crossentropy":
-                metrics = [
-                    tf.keras.metrics.CategoricalAccuracy(name='Accuracy'),
-                    tf.keras.metrics.AUC(name='auc')
-                ]
-            elif self.lossFunctionBox.get() == "Sparse Categorical Crossentropy":
-                metrics = [
-                    tf.keras.metrics.SparseCategoricalAccuracy(name='Accuracy')
-                ]
+            outputSize = self.classCount if self.lossFunctionBox.get() != "Binary Crossentropy" else 1
+            outputActivation = "softmax" if self.lossFunctionBox.get() != "Binary Crossentropy" else "sigmoid"
+            model = self.createModel(outputSize, outputActivation)
+            metrics = ["accuracy"]
+            if self.lossFunctionBox.get() == "Categorical Crossentropy":
+                metrics.append(tf.keras.metrics.AUC(name='auc'))
             model.compile(
                 optimizer=self.optimizerBox.get(),
                 loss=self.lossFunctionNames[self.lossFunctionBox.get()],

@@ -16,7 +16,7 @@ class CNNFrame(AbstractNetworkFrame):
 
     def __init__(self, parentFrame: Frame, fullPath: str, classWeights: dict,
                  classIndexMapping: dict, network: AbstractCNN):
-        super().__init__(parentFrame, fullPath, network, len(classIndexMapping) == 2)
+        super().__init__(parentFrame, fullPath, network, len(classIndexMapping))
         self.classWeights = classWeights
         self.classIndexMapping = classIndexMapping
 
@@ -63,7 +63,9 @@ class CNNFrame(AbstractNetworkFrame):
         seed_value = 1337
 
         classMode = None
-        if self.constructionFrame.lossFunctionBox.get() == "Categorical Crossentropy":
+        if self.constructionFrame.lossFunctionBox.get() == "Binary Crossentropy":
+            classMode = 'binary'
+        elif self.constructionFrame.lossFunctionBox.get() == "Categorical Crossentropy":
             classMode = 'categorical'
         elif self.constructionFrame.lossFunctionBox.get() == "Sparse Categorical Crossentropy":
             classMode = 'sparse'

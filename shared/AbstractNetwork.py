@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class AbstractNetwork(ABC):
 
     @abstractmethod
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         pass
 
     @abstractmethod

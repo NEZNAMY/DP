@@ -36,6 +36,6 @@ class MLPDataSet(AbstractDataSet):
             row=0, column=99, sticky="nsew")
 
     def addNetwork(self, structure: dict):
-        net = MLPNetwork(self.featureCount, self.classCount, structure)
+        net = MLPNetwork(self.featureCount, structure)
         mlp = MLPFrame(self.trainingFrame, self, net)
         self.networks.addNetwork(net.getName(), mlp.getFrame())

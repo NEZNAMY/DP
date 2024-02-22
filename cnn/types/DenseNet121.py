@@ -7,10 +7,7 @@ from cnn.types.AbstractCNN import AbstractCNN
 
 class DenseNet121(AbstractCNN):
 
-    def __init__(self, classCount: int):
-        self.classCount = classCount
-
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         base_model = keras.applications.DenseNet121(
             include_top=False, weights='imagenet', input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
@@ -35,7 +32,7 @@ class DenseNet121(AbstractCNN):
             Dense(64, activation='relu'),
             Dropout(0.5),
             BatchNormalization(),
-            Dense(self.classCount, activation='softmax')
+            Dense(outputLayerSize, activation=outputLayerActivation)
         ], name="densenet121_cnn_model")
 
     def getName(self):

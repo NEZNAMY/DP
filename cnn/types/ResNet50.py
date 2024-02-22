@@ -6,10 +6,7 @@ from cnn.CNNFrame import *
 
 class ResNet50(AbstractCNN):
 
-    def __init__(self, classCount: int):
-        self.classCount = classCount
-
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         base_model = keras.applications.ResNet50(include_top=False, weights='imagenet',
                                                  input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
@@ -33,7 +30,7 @@ class ResNet50(AbstractCNN):
             Dense(64, activation='relu'),
             Dropout(0.5),
             BatchNormalization(),
-            Dense(self.classCount, activation='softmax')
+            Dense(outputLayerSize, activation=outputLayerActivation)
         ], name="resnet50_cnn_model")
 
     def getName(self):

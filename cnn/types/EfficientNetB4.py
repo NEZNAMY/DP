@@ -8,10 +8,7 @@ from cnn.CNNFrame import *
 
 class EfficientNetB4(AbstractCNN):
 
-    def __init__(self, classCount: int):
-        self.classCount = classCount
-
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         base_model = keras.applications.EfficientNetB4(weights='imagenet', include_top=False,
                                                        input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
@@ -27,7 +24,7 @@ class EfficientNetB4(AbstractCNN):
             Dense(4096, activation='relu'),
             BatchNormalization(),
             Dropout(0.5),
-            Dense(self.classCount, activation='softmax')
+            Dense(outputLayerSize, activation='softmax')
         ], name="efficientnet_cnn_model")
 
     def getName(self):

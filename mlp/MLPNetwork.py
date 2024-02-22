@@ -6,12 +6,11 @@ from shared.AbstractNetwork import AbstractNetwork
 
 class MLPNetwork(AbstractNetwork):
 
-    def __init__(self, featureCount: int, classCount: int, structure: dict):
+    def __init__(self, featureCount: int, structure: dict):
         self.featureCount = featureCount
-        self.classCount = classCount
         self.structure = structure
 
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         model = Sequential()
         layers = self.structure["Layers"]
         for index, layer in enumerate(layers):
@@ -23,7 +22,7 @@ class MLPNetwork(AbstractNetwork):
                 model.add(self.dense(int(parameter), activation, first))
             elif layerType == "Dropout":
                 model.add(self.dropout(float(parameter), first))
-        model.add(Dense(self.classCount, activation='softmax'))
+        model.add(Dense(outputLayerSize, activation=outputLayerActivation))
         return model
 
     def dense(self, count, activation, first):

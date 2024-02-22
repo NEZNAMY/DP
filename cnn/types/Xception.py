@@ -7,10 +7,7 @@ from cnn.CNNFrame import *
 
 class Xception(AbstractCNN):
 
-    def __init__(self, classCount: int):
-        self.classCount = classCount
-
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         base_model = keras.applications.Xception(weights='imagenet', include_top=False,
                                                  input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
@@ -23,7 +20,7 @@ class Xception(AbstractCNN):
             Dense(1024, activation='relu'),
             BatchNormalization(),
             Dropout(0.5),
-            Dense(self.classCount, activation='softmax')
+            Dense(outputLayerSize, activation=outputLayerActivation)
         ], name="xception_cnn_model")
 
     def getName(self):

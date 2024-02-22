@@ -7,10 +7,7 @@ from cnn.CNNFrame import *
 
 class InceptionV3(AbstractCNN):
 
-    def __init__(self, classCount: int):
-        self.classCount = classCount
-
-    def createNetwork(self):
+    def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         network = keras.applications.InceptionV3(include_top=False, weights="imagenet",
                                                  input_shape=(self.getImageSize(), self.getImageSize(), 3))
         for layer in network.layers:
@@ -34,7 +31,7 @@ class InceptionV3(AbstractCNN):
             Dense(64, activation='relu'),
             Dropout(0.5),
             BatchNormalization(),
-            Dense(self.classCount, activation='softmax')
+            Dense(outputLayerSize, activation=outputLayerActivation)
         ], name="inception_cnn_model")
 
     def getName(self):

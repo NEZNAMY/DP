@@ -12,7 +12,7 @@ from shared.AbstractNetworkFrame import AbstractNetworkFrame
 class MLPFrame(AbstractNetworkFrame):
 
     def __init__(self, parentFrame: Frame, dataSet: MLPDataSet, network: AbstractNetwork):
-        super().__init__(parentFrame, dataSet.fullPath, network, dataSet.classCount == 2)
+        super().__init__(parentFrame, dataSet.fullPath, network, dataSet.classCount)
         self.dataSet = dataSet
 
     def train(self):

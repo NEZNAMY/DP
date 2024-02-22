@@ -12,7 +12,7 @@ from shared.frames.ModelTrainingFrame import ModelTrainingFrame
 
 class AbstractNetworkFrame(ABC):
 
-    def __init__(self, parentFrame: Frame, fullPath: str, network: AbstractNetwork, allowBinary: bool):
+    def __init__(self, parentFrame: Frame, fullPath: str, network: AbstractNetwork, classCount: int):
         self.model = None
         self.modelImage = None
         self.fullPath = fullPath
@@ -31,7 +31,7 @@ class AbstractNetworkFrame(ABC):
         self.modelInfoFrame.getFrame().grid(row=1, column=0, sticky="en", rowspan=99)
 
         self.constructionFrame = ModelConstructionFrame(self.frame, self.modelFilePath,
-                                                        self.loadModel, network.createNetwork, allowBinary)
+                                                        self.loadModel, network.createNetwork, classCount)
         self.constructionFrame.getFrame().grid(row=1, column=1, sticky="wn", columnspan=2, padx=15)
 
         self.trainingFrame = ModelTrainingFrame(self.frame, self.trainNetwork)

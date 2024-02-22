@@ -43,15 +43,14 @@ class CNNDataSet(AbstractDataSet):
             i += 1
 
     def loadNetworks(self):
-        classCount = len(self.class_weights)
-        self.addNetwork(DenseNet121(classCount))
-        self.addNetwork(EfficientNetB4(classCount))
-        self.addNetwork(InceptionV3(classCount))
-        self.addNetwork(MobileNetV2(classCount))
-        self.addNetwork(ResNet50(classCount))
-        self.addNetwork(VGG16(classCount))
-        self.addNetwork(VGG19(classCount))
-        self.addNetwork(Xception(classCount))
+        self.addNetwork(DenseNet121())
+        self.addNetwork(EfficientNetB4())
+        self.addNetwork(InceptionV3())
+        self.addNetwork(MobileNetV2())
+        self.addNetwork(ResNet50())
+        self.addNetwork(VGG16())
+        self.addNetwork(VGG19())
+        self.addNetwork(Xception())
 
     def addNetwork(self, cnn: AbstractCNN):
         cnf = CNNFrame(self.trainingFrame, self.fullPath, self.class_weights, self.classIndexMapping, cnn)
