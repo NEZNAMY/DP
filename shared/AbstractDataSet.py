@@ -9,14 +9,17 @@ from options import Options
 class AbstractDataSet(ABC):
 
     def __init__(self, tk: Tk, fullPath: str, displayName: str):
+        self.fullPath = fullPath
+        self.displayName = displayName
+
+        self.categories = self.loadCategories()
+        self.classIndexMapping = {i: className for i, className in enumerate(self.categories)}
+
         self.frame = Frame(tk)
         Options.instance.addFrame(self.frame)
         self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_columnconfigure(0, weight=0)
         self.frame.grid_columnconfigure(1, weight=1)
-        self.fullPath = fullPath
-        self.displayName = displayName
-        self.loadDataSet()
 
         self.trainingFrame = Frame(self.frame)
         Options.instance.addFrame(self.trainingFrame)
@@ -38,9 +41,9 @@ class AbstractDataSet(ABC):
         pass
 
     @abstractmethod
-    def loadDataSet(self):
+    def loadNetworks(self):
         pass
 
     @abstractmethod
-    def loadNetworks(self):
+    def loadCategories(self):
         pass

@@ -14,10 +14,9 @@ from shared.AbstractNetworkFrame import AbstractNetworkFrame
 
 class CNNFrame(AbstractNetworkFrame):
 
-    def __init__(self, parentFrame: Frame, fullPath: str, classWeights: dict,
+    def __init__(self, parentFrame: Frame, fullPath: str,
                  classIndexMapping: dict, network: AbstractCNN):
         super().__init__(parentFrame, fullPath, network, len(classIndexMapping))
-        self.classWeights = classWeights
         self.classIndexMapping = classIndexMapping
 
         self.testingFrame = ModelTestingFrame(self.frame, classIndexMapping)
@@ -103,7 +102,6 @@ class CNNFrame(AbstractNetworkFrame):
             train_ds,
             validation_data=val_ds,
             epochs=self.trainingFrame.getEpochCount(),
-            class_weight=self.classWeights,
             callbacks=[checkpoint_cb, lr_scheduler, custom_callback]
         )
 

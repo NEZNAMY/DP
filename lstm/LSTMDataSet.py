@@ -12,6 +12,9 @@ from shared.AbstractDataSet import AbstractDataSet
 
 class LSTMDataSet(AbstractDataSet):
 
+    def loadCategories(self):
+        return []
+
     def __init__(self, tk: Tk, fullPath: str, displayName: str):
         super().__init__(tk, fullPath, displayName)
 

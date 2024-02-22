@@ -14,18 +14,19 @@ from shared.AbstractDataSet import AbstractDataSet
 class MLPDataSet(AbstractDataSet):
 
     def __init__(self, tk: Tk, fullPath: str, displayName: str):
+        self.features = pd.read_csv(os.path.join(fullPath, 'features.csv'))
+        self.featureCount = len(self.features.columns.tolist())
+        self.target = pd.read_csv(os.path.join(fullPath, 'targets.csv'))
+        self.classCount = self.target['target'].nunique()
+        self.classes = self.target['target'].value_counts().to_dict()
         super().__init__(tk, fullPath, displayName)
 
     def createInfoFrame(self):
         self.info = MLPInfoFrame(self.frame, self.displayName, self.features, self.classes)
         return self.info.getFrame()
 
-    def loadDataSet(self):
-        self.features = pd.read_csv(os.path.join(self.fullPath, 'features.csv'))
-        self.featureCount = len(self.features.columns.tolist())
-        self.target = pd.read_csv(os.path.join(self.fullPath, 'targets.csv'))
-        self.classCount = self.target['target'].nunique()
-        self.classes = self.target['target'].value_counts().to_dict()
+    def loadCategories(self):
+        return pd.read_csv(os.path.join(self.fullPath, 'targets.csv'))['target'].unique()
 
     def loadNetworks(self):
         for structure in Config.instance.getMLPStructures():
