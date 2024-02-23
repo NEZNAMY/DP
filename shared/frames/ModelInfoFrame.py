@@ -49,7 +49,7 @@ class ModelInfoFrame:
             self.testAccuracyLabel.grid(row=5, column=1)
             self.testAccuracyValue.grid(row=5, column=2)
             self.modelInfoLabel.grid(row=2, column=0, rowspan=99)
-            self.confusionMatrixLabel.grid(row=6, column=1, columnspan=99, rowspan=99)
+            self.confusionMatrixLabel.grid(row=6, column=1, columnspan=99, rowspan=99, sticky="n")
 
         self.model = model
         self.updateModelInfo(accuracy)
