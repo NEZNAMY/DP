@@ -41,7 +41,7 @@ class AbstractNetworkFrame(ABC):
                                                         self.loadModel, network.createNetwork, classCount)
         self.constructionFrame.getFrame().grid(row=1, column=1, sticky="wn", columnspan=2, padx=15)
 
-        self.trainingFrame = ModelTrainingFrame(self.frame, self.trainNetwork)
+        self.trainingFrame = ModelTrainingFrame(self.frame, self)
         self.trainingFrame.getFrame().grid(row=2, column=1, sticky="wn", padx=15, pady=15)
 
     def getFrame(self):
@@ -74,20 +74,6 @@ class AbstractNetworkFrame(ABC):
         if img is None:
             return
         self.modelInfoFrame.setConfusionMatrix(img)
-
-    def trainNetwork(self):
-        def train():
-            self.constructionFrame.disableButtons()
-            self.train()
-            self.trainingFrame.setTrainButtonText("Saving model...")
-            self.model.save(self.modelFilePath)
-            self.constructionFrame.checkSavedModel()
-            self.trainingFrame.setTrainButtonText("Train")
-            self.trainingFrame.enableTrainButton()
-            self.constructionFrame.enableButtons()
-
-        self.trainingFrame.disableTrainButton()
-        threading.Thread(target=train).start()
 
     def fig2img(self, fig: Figure):
         fig.canvas.draw()

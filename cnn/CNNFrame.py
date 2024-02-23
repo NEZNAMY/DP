@@ -34,10 +34,10 @@ class CNNFrame(AbstractNetworkFrame):
         train_dir = os.path.join(self.fullPath, 'train')
 
         if (not os.path.exists(train_dir)) or (not os.path.exists(test_dir)):
-            self.trainingFrame.setTrainButtonText("Splitting data...")
+            self.trainingFrame.setSplittingData()
             self.splitData()
 
-        self.trainingFrame.setTrainButtonText("Starting...")
+        self.trainingFrame.setStartingPhaseText()
         count = 0
         for subdir in sorted(os.listdir(train_dir)):
             sub = os.path.join(train_dir, subdir)
@@ -90,7 +90,7 @@ class CNNFrame(AbstractNetworkFrame):
             seed=seed_value
         )
 
-        self.trainingFrame.setTrainButtonText("Training... (0%)")
+        self.trainingFrame.setTrainingPhaseText(0)
 
         self.model.fit(
             train_ds,
@@ -99,17 +99,15 @@ class CNNFrame(AbstractNetworkFrame):
             callbacks=[checkpoint_cb, lr_scheduler, custom_callback]
         )
 
-        self.trainingFrame.setTrainButtonText("Testing results...")
-
-        test_ds = self.prepareTestDataSet()
-
+        self.trainingFrame.setTestingTrainData()
         self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(train_ds)[1])
-        self.modelInfoFrame.setTestAccuracy(self.model.evaluate(test_ds)[1])
-        val_acc = self.model.evaluate(val_ds)[1]
-        print(f"Validation Accuracy: {val_acc}")
+
+        self.trainingFrame.setTestingTestData()
+        self.modelInfoFrame.setTestAccuracy(self.model.evaluate(self.prepareTestDataSet())[1])
+        # val_acc = self.model.evaluate(val_ds)[1]
 
         # Print confusion matrix
-        self.trainingFrame.setTrainButtonText("Creating confusion matrix...")
+        self.trainingFrame.setCreatingConfusionMatrix()
         self.updateConfusionMatrix()
 
     def prepareTestDataSet(self):
@@ -188,4 +186,4 @@ class CustomCallback(tf.keras.callbacks.Callback):
     def on_train_batch_end(self, batch, logs=None):
         self.batchCount += 1
         percent = int(self.batchCount/self.totalBatches*100)
-        self.anf.trainingFrame.setTrainButtonText("Training... (" + str(percent) + "%)")
+        self.anf.trainingFrame.setTrainingPhaseText(percent)

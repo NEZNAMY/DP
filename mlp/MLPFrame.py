@@ -20,7 +20,7 @@ class MLPFrame(AbstractNetworkFrame):
         self.dataSet = dataSet
 
     def train(self):
-        self.trainingFrame.setTrainButtonText("Starting...")
+        self.trainingFrame.setStartingPhaseText()
 
         X, y_encoded = self.prepareData()
         X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
@@ -33,7 +33,7 @@ class MLPFrame(AbstractNetworkFrame):
         checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(self.modelFilePath, save_best_only=True)
         custom_callback = CustomMLPCallback(self, self.trainingFrame.getEpochCount())
 
-        self.trainingFrame.setTrainButtonText("Training... (0%)")
+        self.trainingFrame.setTrainingPhaseText(0)
         self.model.fit(
             X_train_scaled,
             y_train,
@@ -44,11 +44,13 @@ class MLPFrame(AbstractNetworkFrame):
             verbose=0
         )
 
-        self.trainingFrame.setTrainButtonText("Testing results...")
+        self.trainingFrame.setTestingTrainData()
         self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(X_train, y_train)[1])
+
+        self.trainingFrame.setTestingTestData()
         self.modelInfoFrame.setTestAccuracy(self.model.evaluate(X_test, y_test)[1])
 
-        self.trainingFrame.setTrainButtonText("Creating confusion matrix...")
+        self.trainingFrame.setCreatingConfusionMatrix()
         self.updateConfusionMatrix()
 
     def createConfusionMatrix(self):
@@ -130,4 +132,4 @@ class CustomMLPCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         percent = int((epoch+1) / self.totalEpochs * 100)
-        self.anf.trainingFrame.setTrainButtonText("Training... (" + str(percent) + "%)")
+        self.anf.trainingFrame.setTrainingPhaseText(percent)

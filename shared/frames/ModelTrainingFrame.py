@@ -1,11 +1,13 @@
+import threading
 from tkinter import Label, Entry, Button, Frame
-from typing import Callable
 from options import Options
+from shared import AbstractNetworkFrame
 
 
 class ModelTrainingFrame:
 
-    def __init__(self, parentFrame: Frame, trainCommand: Callable):
+    def __init__(self, parentFrame: Frame, networkFrame: AbstractNetworkFrame):
+        self.networkFrame = networkFrame
         self.frame = Frame(parentFrame)
         Options.instance.addFrame(self.frame)
         self.frame.columnconfigure(0, weight=1)
@@ -23,7 +25,7 @@ class ModelTrainingFrame:
         self.batchEntry.insert(0, "32")
         self.batchEntry.grid(row=3, column=1)
 
-        self.trainButton = Button(self.frame, text="Train", command=trainCommand)
+        self.trainButton = Button(self.frame, text="Train", command=self.trainNetwork)
         self.trainButton.grid(row=4, column=0, columnspan=2)
         self.trainButton.config(state="disabled")
 
@@ -50,3 +52,38 @@ class ModelTrainingFrame:
 
     def hideWarn(self):
         self.warnLabel.config(text="")
+
+    def trainNetwork(self):
+        def train():
+            self.networkFrame.constructionFrame.disableButtons()
+            self.networkFrame.train()
+            self.setSavingModel()
+            self.networkFrame.model.save(self.networkFrame.modelFilePath)
+            self.networkFrame.constructionFrame.checkSavedModel()
+            self.setTrainButtonText("Train")
+            self.enableTrainButton()
+            self.networkFrame.constructionFrame.enableButtons()
+
+        self.disableTrainButton()
+        threading.Thread(target=train).start()
+
+    def setSplittingData(self):
+        self.setTrainButtonText("Phase 0/6: Splitting data into train/test")
+
+    def setStartingPhaseText(self):
+        self.setTrainButtonText("Phase 1/6: Starting...")
+
+    def setTrainingPhaseText(self, progress: int):
+        self.setTrainButtonText("Phase 2/6: Training... (" + str(progress) + "%)")
+
+    def setTestingTrainData(self):
+        self.setTrainButtonText("Phase 3/6: Testing accuracy on training data...")
+
+    def setTestingTestData(self):
+        self.setTrainButtonText("Phase 4/6: Testing accuracy on testing data...")
+
+    def setCreatingConfusionMatrix(self):
+        self.setTrainButtonText("Phase 5/6: Creating confusion matrix...")
+
+    def setSavingModel(self):
+        self.setTrainButtonText("Phase 6/6: Saving model...")
