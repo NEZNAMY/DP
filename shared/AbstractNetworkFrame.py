@@ -1,7 +1,6 @@
 import os
-import threading
 from abc import ABC, abstractmethod
-from tkinter import Frame, Label
+from tkinter import Frame, Label, Button
 
 import numpy as np
 from PIL import Image, ImageTk
@@ -11,7 +10,7 @@ from matplotlib.figure import Figure
 from options import Options
 from shared import AbstractNetwork
 from shared.WrappedModel import WrappedModel
-from shared.frames.ModelConstructionFrame import ModelConstructionFrame
+from shared.frames.construction.ModelConstructionFrame import ModelConstructionFrame
 from shared.frames.ModelInfoFrame import ModelInfoFrame
 from shared.frames.ModelTrainingFrame import ModelTrainingFrame
 
@@ -37,7 +36,7 @@ class AbstractNetworkFrame(ABC):
         self.modelInfoFrame = ModelInfoFrame(self.frame)
         self.modelInfoFrame.getFrame().grid(row=1, column=0, sticky="en", rowspan=99)
 
-        self.constructionFrame = ModelConstructionFrame(self.frame, self.modelFilePath,
+        self.constructionFrame = ModelConstructionFrame(self, self.modelFilePath,
                                                         self.loadModel, network.createNetwork, classCount)
         self.constructionFrame.getFrame().grid(row=1, column=1, sticky="wn", columnspan=2, padx=15)
 
@@ -47,11 +46,13 @@ class AbstractNetworkFrame(ABC):
     def getFrame(self):
         return self.frame
 
-    def loadModel(self, model):
+    def loadModel(self, model, button: Button):
         self.model = model
         self.trainingFrame.enableTrainButton()
         self.trainingFrame.hideWarn()
+        button.config(text="Phase 2/3: Testing model accuracy...")
         self.modelInfoFrame.setModel(WrappedModel(model), self.testAccuracy())
+        button.config(text="Phase 3/3: Creating confusion matrix...")
         self.updateConfusionMatrix()
 
     def updateConfusionMatrix(self):

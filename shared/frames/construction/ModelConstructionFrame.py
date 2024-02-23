@@ -4,21 +4,23 @@ from tkinter import Label, Button, Frame
 from tkinter.ttk import Combobox
 from typing import Callable
 
-import tensorflow
 import tensorflow as tf
 
 from options import Options
+from shared import AbstractNetworkFrame
+from shared.frames.construction.ModelLoadingFromFile import ModelLoadingFromFile
 
 
 class ModelConstructionFrame:
 
-    def __init__(self, parentFrame: Frame, modelFilePath: str, loadModel: Callable, createModel: Callable,
+    def __init__(self, parent: AbstractNetworkFrame, modelFilePath: str, loadModel: Callable, createModel: Callable,
                  classCount: int):
+        self.parent = parent
         self.modelFilePath = modelFilePath
         self.loadModel = loadModel
         self.createModel = createModel
         self.classCount = classCount
-        self.constructionFrame = Frame(parentFrame)
+        self.constructionFrame = Frame(parent.getFrame())
         Options.instance.addFrame(self.constructionFrame)
         Label(self.constructionFrame, text="Construction menu", font=16).grid(row=0, column=0, columnspan=99)
         self.constructionFrame.columnconfigure(0, weight=1)
@@ -57,38 +59,11 @@ class ModelConstructionFrame:
         self.createButton.grid(row=4, column=0, columnspan=2)
 
         # Load
-        self.loadFrame = Frame(self.constructionFrame)
-        Options.instance.addFrame(self.loadFrame)
-        self.loadFrame.grid(row=1, column=1)
-        self.loadFrame.columnconfigure(0, weight=1)
-        self.loadFrame.columnconfigure(1, weight=1)
-
-        Label(self.loadFrame, text="Load model from file").grid(row=0, column=0)
-        Label(self.loadFrame, text="").grid(row=1, column=0, columnspan=2)
-        self.loadButton = Button(self.loadFrame, text="Load from file", command=self.loadFromFile)
-        self.loadButton.grid(row=4, column=0)
-        self.loadButton.config(state="disabled")
-        self.foundLabel = Label(self.loadFrame, text="No saved model was found", foreground="red")
-        self.checkSavedModel()
-        self.foundLabel.grid(row=3, column=0)
-
-    def checkSavedModel(self):
-        if os.path.exists(self.modelFilePath):
-            self.loadButton.config(state="normal")
-            size = format(os.path.getsize(self.modelFilePath) / 1024 / 1024, '.2f') + " MB"
-            self.foundLabel.config(text="Saved model available (" + size + ")", foreground="green")
+        self.modelLoading = ModelLoadingFromFile(self, self.modelFilePath)
+        self.modelLoading.getFrame().grid(row=1, column=1)
 
     def getFrame(self):
         return self.constructionFrame
-
-    def loadFromFile(self):
-        def load():
-            model = tensorflow.keras.models.load_model(self.modelFilePath)
-            self.loadModel(model)
-            self.loadButton.config(state="normal", text="Load from file")
-
-        self.loadButton.config(state="disabled", text="Loading...")
-        threading.Thread(target=load).start()
 
     def createNew(self):
         def create():
@@ -103,16 +78,16 @@ class ModelConstructionFrame:
                 loss=self.lossFunctionNames[self.lossFunctionBox.get()],
                 metrics=metrics
             )
+            self.loadModel(model, self.createButton)
             self.createButton.config(state="normal", text="Create new")
-            self.loadModel(model)
 
-        self.createButton.config(state="disabled", text="Creating...")
+        self.createButton.config(state="disabled", text="Phase 1/3: Constructing model...")
         threading.Thread(target=create).start()
 
     def disableButtons(self):
         self.createButton.config(state="disabled")
-        self.loadButton.config(state="disabled")
+        self.modelLoading.loadButton.config(state="disabled")
 
     def enableButtons(self):
         self.createButton.config(state="normal")
-        self.loadButton.config(state="normal" if os.path.exists(self.modelFilePath) else "disabled")
+        self.modelLoading.loadButton.config(state="normal" if os.path.exists(self.modelFilePath) else "disabled")

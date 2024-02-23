@@ -78,8 +78,8 @@ class MLPFrame(AbstractNetworkFrame):
     def testAccuracy(self):
         X, y_encoded = self.prepareData()
         X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
-        train_results = self.model.evaluate(X_train, y_train)
-        test_results = self.model.evaluate(X_test, y_test)
+        train_results = self.model.evaluate(X_train, y_train, verbose=0)
+        test_results = self.model.evaluate(X_test, y_test, verbose=0)
         return [train_results[1], test_results[1]]
 
     def getLossFunctionName(self, lossFunction):

@@ -24,8 +24,8 @@ class CNNFrame(AbstractNetworkFrame):
         self.testingFrame = ModelTestingFrame(self.frame, classIndexMapping)
         self.testingFrame.getFrame().grid(row=2, column=2, sticky="wn", pady=15)
 
-    def loadModel(self, model):
-        super().loadModel(model)
+    def loadModel(self, model, button: Button):
+        super().loadModel(model, button)
         self.testingFrame.loadModel(model, self.network.getImageSize())
 
     def train(self):
