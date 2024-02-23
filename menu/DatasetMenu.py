@@ -2,6 +2,7 @@ import time
 
 from cnn.CNNDataSet import *
 from lstm.LSTMDataSet import LSTMDataSet
+from mlp import MLPConstructionMenu
 from mlp.MLPDataSet import MLPDataSet
 
 
@@ -48,13 +49,17 @@ class DatasetMenu:
 
         self.addDataSet(dataset1, "Dataset 1 - Parkinson spiral drawing [CNN]")
         self.menu.add_separator()
-        self.addDataSet(dataset2, "Dataset 2 - Alzheimer Features [MLP]")
-        self.addDataSet(dataset3, "Dataset 3 - Alzheimer Handwriting [MLP]")
-        self.addDataSet(dataset4, "Dataset 4 - Alzheimer Plasma [MLP]")
-        self.addDataSet(dataset5, "Dataset 5 - Parkinson Features [MLP]")
-        self.addDataSet(dataset6, "Dataset 6 - Parkinson Speech [MLP]")
+        self.addMLPDataSet(dataset2, "Dataset 2 - Alzheimer Features [MLP]")
+        self.addMLPDataSet(dataset3, "Dataset 3 - Alzheimer Handwriting [MLP]")
+        self.addMLPDataSet(dataset4, "Dataset 4 - Alzheimer Plasma [MLP]")
+        self.addMLPDataSet(dataset5, "Dataset 5 - Parkinson Features [MLP]")
+        self.addMLPDataSet(dataset6, "Dataset 6 - Parkinson Speech [MLP]")
         self.menu.add_separator()
         self.addDataSet(dataset99, "Dataset 99 - Test [LSTM]")
+
+    def addMLPDataSet(self, dataSet: MLPDataSet, displayName: str):
+        self.addDataSet(dataSet, displayName)
+        MLPConstructionMenu.mlpDataSets.append(dataSet)
 
     def addDataSet(self, dataSet: AbstractDataSet, displayName: str):
         self.menu.add_command(label=displayName, command=lambda: self.showFrame(dataSet.getFrame()))

@@ -33,7 +33,7 @@ class MLPDataSet(AbstractDataSet):
             self.addNetwork(structure)
 
         Button(self.networks.frame, text="+ New network structure", foreground="green", width=25,
-               command=lambda: MLPConstructionMenu(Config.instance.getMLPStructureNames(), self.addNetwork)).grid(
+               command=lambda: MLPConstructionMenu()).grid(
             row=0, column=99, sticky="nsew")
 
     def addNetwork(self, structure: dict):

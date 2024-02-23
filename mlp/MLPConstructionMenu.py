@@ -36,9 +36,7 @@ class MLPLayer:
 
 class MLPConstructionMenu:
 
-    def __init__(self, takenNames: list, addStructure: Callable):
-        self.takenNames = takenNames
-        self.addStructure = addStructure
+    def __init__(self):
         self.layers = []
         self.window = Toplevel()
         self.window.geometry("700x500")
@@ -107,7 +105,7 @@ class MLPConstructionMenu:
         if len(self.layers) == 0:
             self.createWindowError.config(text="Could not create model: No layers are defined")
             return
-        if self.structureName.get() in self.takenNames:
+        if self.structureName.get() in Config.instance.getMLPStructureNames():
             self.createWindowError.config(text="Could not create model: This name is already taken")
             return
         if self.structureName.get() == "":
@@ -125,7 +123,8 @@ class MLPConstructionMenu:
             })
         self.window.destroy()
         Config.instance.addMLPStructure(structure)
-        self.addStructure(structure)
+        for dataSet in mlpDataSets:
+            dataSet.addNetwork(structure)
 
     def addLayer(self):
         display = self.parameterEntry.get()
@@ -161,3 +160,6 @@ class MLPConstructionMenu:
             remainingLayer.setRow(i)
             remainingLayer.grid()
             i += 1
+
+
+mlpDataSets = []
