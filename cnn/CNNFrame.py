@@ -63,14 +63,6 @@ class CNNFrame(AbstractNetworkFrame):
         BATCH_SIZE = self.trainingFrame.getBatchSize()
         seed_value = 1337
 
-        classMode = None
-        if self.constructionFrame.lossFunctionBox.get() == "Binary Crossentropy":
-            classMode = 'binary'
-        elif self.constructionFrame.lossFunctionBox.get() == "Categorical Crossentropy":
-            classMode = 'categorical'
-        elif self.constructionFrame.lossFunctionBox.get() == "Sparse Categorical Crossentropy":
-            classMode = 'sparse'
-
         train_datagen = ImageDataGenerator(
             rescale=1. / 255,
             zoom_range=[.99, 1.01],
@@ -84,7 +76,7 @@ class CNNFrame(AbstractNetworkFrame):
             train_dir,
             target_size=IMAGE_SIZE,
             batch_size=BATCH_SIZE,
-            class_mode=classMode,
+            class_mode=self.modelInfoFrame.model.getLossFunctionClassMode(),
             subset='validation',
             seed=seed_value
         )
@@ -93,7 +85,7 @@ class CNNFrame(AbstractNetworkFrame):
             train_dir,
             target_size=IMAGE_SIZE,
             batch_size=BATCH_SIZE,
-            class_mode=classMode,
+            class_mode=self.modelInfoFrame.model.getLossFunctionClassMode(),
             subset='training',
             seed=seed_value
         )
