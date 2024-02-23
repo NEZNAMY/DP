@@ -5,11 +5,12 @@ from tkinter import Frame, Label
 
 import numpy as np
 from PIL import Image, ImageTk
-from PIL.ImageTk import PhotoImage
+from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 
 from options import Options
 from shared import AbstractNetwork
+from shared.WrappedModel import WrappedModel
 from shared.frames.ModelConstructionFrame import ModelConstructionFrame
 from shared.frames.ModelInfoFrame import ModelInfoFrame
 from shared.frames.ModelTrainingFrame import ModelTrainingFrame
@@ -50,11 +51,29 @@ class AbstractNetworkFrame(ABC):
         self.model = model
         self.trainingFrame.enableTrainButton()
         self.trainingFrame.hideWarn()
-        self.modelInfoFrame.setModel(model, self.testAccuracy())
-        img = self.createConfusionMatrix()
+        self.modelInfoFrame.setModel(WrappedModel(model), self.testAccuracy())
+        self.updateConfusionMatrix()
+
+    def updateConfusionMatrix(self):
+        disp = self.createConfusionMatrix()
+        if disp is None:
+            return
+
+        fig, ax = plt.subplots(figsize=(4, 4), dpi=80)
+        disp.plot(cmap='Blues', ax=ax)
+        ax.get_figure().delaxes(ax.figure.axes[-1])
+
+        plt.xticks(rotation=80)
+        plt.xlabel('Predicted', color='red')
+        plt.ylabel('True', color='blue')
+        plt.title('Confusion Matrix')
+
+        fig.tight_layout()
+        img = self.fig2img(fig)
+        plt.close(fig)
         if img is None:
             return
-        self.showConfusionMatrix(img)
+        self.modelInfoFrame.setConfusionMatrix(img)
 
     def trainNetwork(self):
         def train():
@@ -76,14 +95,6 @@ class AbstractNetworkFrame(ABC):
         img_data = img_data.reshape(fig.canvas.get_width_height()[::-1] + (4,))
         img = Image.fromarray(img_data, 'RGBA')
         return ImageTk.PhotoImage(img)
-
-    def showConfusionMatrix(self, img: PhotoImage):
-        if self.confusionMatrixLabel is not None:
-            self.confusionMatrixLabel.grid_forget()
-        self.confusionMatrixLabel = Label(self.trainingFrame.getFrame())
-        self.confusionMatrixLabel.grid(row=9, column=0, columnspan=99)
-        self.confusionMatrixLabel.img = img  # Keep a reference to avoid garbage collection
-        self.confusionMatrixLabel.config(image=img)
 
     @abstractmethod
     def createConfusionMatrix(self):

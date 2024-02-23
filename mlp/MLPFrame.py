@@ -1,6 +1,5 @@
 from tkinter import Frame
 
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -50,7 +49,7 @@ class MLPFrame(AbstractNetworkFrame):
         self.modelInfoFrame.setTestAccuracy(self.model.evaluate(X_test, y_test)[1])
 
         self.trainingFrame.setTrainButtonText("Creating confusion matrix...")
-        self.showConfusionMatrix(self.createConfusionMatrix())
+        self.updateConfusionMatrix()
 
     def createConfusionMatrix(self):
         X, y_encoded = self.prepareData()
@@ -61,26 +60,18 @@ class MLPFrame(AbstractNetworkFrame):
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
 
-        if self.modelInfoFrame.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
+        if self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
             y_pred = np.argmax(self.model.predict(X_test_scaled), axis=1)
             cm = confusion_matrix(y_test.argmax(axis=1), y_pred, labels=np.unique(y_encoded.argmax(axis=1)))
-        elif self.modelInfoFrame.getLossFunctionName(self.model.loss) == "sparse_categorical_crossentropy":
+        elif self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "sparse_categorical_crossentropy":
             y_pred = np.argmax(self.model.predict(X_test_scaled), axis=1)
             cm = confusion_matrix(y_test, y_pred, labels=np.unique(y_encoded))
-        elif self.modelInfoFrame.getLossFunctionName(self.model.loss) == "binary_crossentropy":
+        elif self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "binary_crossentropy":
             y_pred_binary = (self.model.predict(X_test_scaled) > 0.5).astype(int)
             cm = confusion_matrix(y_test, y_pred_binary)
         else:
             raise ValueError("Unsupported loss function")
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=self.dataSet.categories)
-
-        fig, ax = plt.subplots(figsize=(5, 4))
-        disp.plot(cmap='Blues', values_format=".2f", ax=ax)
-        fig.tight_layout()
-        img = self.fig2img(fig)
-        plt.close(fig)
-
-        return img
+        return ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=self.dataSet.categories)
 
     def testAccuracy(self):
         X, y_encoded = self.prepareData()
@@ -88,6 +79,17 @@ class MLPFrame(AbstractNetworkFrame):
         train_results = self.model.evaluate(X_train, y_train)
         test_results = self.model.evaluate(X_test, y_test)
         return [train_results[1], test_results[1]]
+
+    def getLossFunctionName(self, lossFunction):
+        if type(lossFunction) is str:
+            return lossFunction
+
+        try:
+            # MLP
+            return lossFunction.__name__
+        except AttributeError:
+            # CNN
+            return lossFunction.__class__.__name__
 
     def prepareData(self):
         self.dataSet.features.fillna(0, inplace=True)
@@ -97,7 +99,7 @@ class MLPFrame(AbstractNetworkFrame):
         y_encoded = label_encoder.fit_transform(self.dataSet.target.values.flatten())
 
         # Convert numerical labels to one-hot encoding if using categorical_crossentropy
-        if self.modelInfoFrame.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
+        if self.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
             y_encoded = to_categorical(y_encoded)
 
         # One-hot encode categorical columns in features

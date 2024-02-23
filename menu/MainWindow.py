@@ -9,7 +9,7 @@ class MainWindow:
 
     def __init__(self, tk: Tk):
         tk.title("Návrh štruktúr neurónových sietí vhodných na detekciu ochorení z meraných signálov")
-        tk.geometry("1200x600")
+        tk.geometry("1300x600")
         tk.protocol("WM_DELETE_WINDOW", sys.exit)
         menu_bar = Menu(tk)
 
