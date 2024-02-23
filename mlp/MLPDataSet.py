@@ -26,7 +26,7 @@ class MLPDataSet(AbstractDataSet):
         return self.info.getFrame()
 
     def loadCategories(self):
-        return pd.read_csv(os.path.join(self.fullPath, 'targets.csv'))['target'].unique()
+        return sorted(pd.read_csv(os.path.join(self.fullPath, 'targets.csv'))['target'].unique())
 
     def loadNetworks(self):
         for structure in Config.instance.getMLPStructures():

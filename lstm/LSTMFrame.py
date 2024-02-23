@@ -35,3 +35,6 @@ class LSTMFrame(AbstractNetworkFrame):
 
     def testAccuracy(self):
         return [0, 0]  # TODO
+
+    def createConfusionMatrix(self):
+        return None

@@ -4,7 +4,10 @@ import random
 import shutil
 from tkinter import *
 
+import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from cnn.ModelTestingFrame import ModelTestingFrame
@@ -107,17 +110,58 @@ class CNNFrame(AbstractNetworkFrame):
 
         self.trainingFrame.setTrainButtonText("Testing results...")
 
-        test_ds = train_datagen.flow_from_directory(
+        test_ds = self.prepareTestDataSet()
+
+        self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(train_ds)[1])
+        self.modelInfoFrame.setTestAccuracy(self.model.evaluate(test_ds)[1])
+        val_acc = self.model.evaluate(val_ds)[1]
+        print(f"Validation Accuracy: {val_acc}")
+
+        # Print confusion matrix
+        self.trainingFrame.setTrainButtonText("Creating confusion matrix...")
+        self.showConfusionMatrix(self.createConfusionMatrix())
+
+    def prepareTestDataSet(self):
+        IMAGE_SIZE = [self.network.getImageSize(), self.network.getImageSize()]
+        BATCH_SIZE = self.trainingFrame.getBatchSize()
+        test_dir = os.path.join(self.fullPath, 'test')
+
+        classMode = None
+        if self.modelInfoFrame.lossValue.cget("text") == "Binary Crossentropy":
+            classMode = 'binary'
+        elif self.modelInfoFrame.lossValue.cget("text") == "Categorical Crossentropy":
+            classMode = 'categorical'
+        elif self.modelInfoFrame.lossValue.cget("text") == "Sparse Categorical Crossentropy":
+            classMode = 'sparse'
+
+        return ImageDataGenerator(rescale=1. / 255).flow_from_directory(
             test_dir,
             target_size=IMAGE_SIZE,
             batch_size=BATCH_SIZE,
             class_mode=classMode,
-            subset='validation',
-            seed=seed_value
+            shuffle=False
         )
 
-        self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(train_ds)[1])
-        self.modelInfoFrame.setTestAccuracy(self.model.evaluate(test_ds)[1])
+    def createConfusionMatrix(self):
+        test_ds = self.prepareTestDataSet()
+        class_indices = test_ds.class_indices
+
+        probabilities = self.model.predict(test_ds)
+
+        if self.modelInfoFrame.getLossFunctionName(self.model.loss) == "binary_crossentropy":
+            y_pred_binary = (probabilities > 0.5).astype(int)
+            cm = confusion_matrix(test_ds.classes, y_pred_binary)
+        else:
+            y_pred = np.argmax(probabilities, axis=1)
+            cm = confusion_matrix(test_ds.classes, y_pred, labels=list(class_indices.values()))
+
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(class_indices.keys()))
+        fig, ax = plt.subplots(figsize=(6, 5), dpi=60)
+        disp.plot(cmap='Blues', values_format=".2f", ax=ax)
+        fig.tight_layout()
+        img = self.fig2img(fig)
+        plt.close(fig)
+        return img
 
     def testAccuracy(self):
         return [0, 0]  # TODO

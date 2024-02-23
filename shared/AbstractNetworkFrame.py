@@ -3,6 +3,11 @@ import threading
 from abc import ABC, abstractmethod
 from tkinter import Frame, Label
 
+import numpy as np
+from PIL import Image, ImageTk
+from PIL.ImageTk import PhotoImage
+from matplotlib.figure import Figure
+
 from options import Options
 from shared import AbstractNetwork
 from shared.frames.ModelConstructionFrame import ModelConstructionFrame
@@ -13,6 +18,7 @@ from shared.frames.ModelTrainingFrame import ModelTrainingFrame
 class AbstractNetworkFrame(ABC):
 
     def __init__(self, parentFrame: Frame, fullPath: str, network: AbstractNetwork, classCount: int):
+        self.confusionMatrixLabel = None
         self.model = None
         self.modelImage = None
         self.fullPath = fullPath
@@ -45,6 +51,10 @@ class AbstractNetworkFrame(ABC):
         self.trainingFrame.enableTrainButton()
         self.trainingFrame.hideWarn()
         self.modelInfoFrame.setModel(model, self.testAccuracy())
+        img = self.createConfusionMatrix()
+        if img is None:
+            return
+        self.showConfusionMatrix(img)
 
     def trainNetwork(self):
         def train():
@@ -59,6 +69,25 @@ class AbstractNetworkFrame(ABC):
 
         self.trainingFrame.disableTrainButton()
         threading.Thread(target=train).start()
+
+    def fig2img(self, fig: Figure):
+        fig.canvas.draw()
+        img_data = np.frombuffer(fig.canvas.get_renderer().buffer_rgba(), dtype=np.uint8)
+        img_data = img_data.reshape(fig.canvas.get_width_height()[::-1] + (4,))
+        img = Image.fromarray(img_data, 'RGBA')
+        return ImageTk.PhotoImage(img)
+
+    def showConfusionMatrix(self, img: PhotoImage):
+        if self.confusionMatrixLabel is not None:
+            self.confusionMatrixLabel.grid_forget()
+        self.confusionMatrixLabel = Label(self.trainingFrame.getFrame())
+        self.confusionMatrixLabel.grid(row=9, column=0, columnspan=99)
+        self.confusionMatrixLabel.img = img  # Keep a reference to avoid garbage collection
+        self.confusionMatrixLabel.config(image=img)
+
+    @abstractmethod
+    def createConfusionMatrix(self):
+        pass
 
     @abstractmethod
     def train(self):

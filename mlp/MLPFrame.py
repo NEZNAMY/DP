@@ -1,9 +1,14 @@
 from tkinter import Frame
 
+import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.utils import to_categorical
+
 from mlp import MLPDataSet
 from shared import AbstractNetwork
 from shared.AbstractNetworkFrame import AbstractNetworkFrame
@@ -18,47 +23,87 @@ class MLPFrame(AbstractNetworkFrame):
     def train(self):
         self.trainingFrame.setTrainButtonText("Starting...")
 
-        X_train, X_test, y_train, y_test = self.prepareData()
+        X, y_encoded = self.prepareData()
+        X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+
+        # Standardize features by removing the mean and scaling to unit variance
+        scaler = StandardScaler(with_mean=False)
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
 
         checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(self.modelFilePath, save_best_only=True)
         custom_callback = CustomMLPCallback(self, self.trainingFrame.getEpochCount())
 
         self.trainingFrame.setTrainButtonText("Training... (0%)")
         self.model.fit(
-            X_train,
+            X_train_scaled,
             y_train,
             epochs=self.trainingFrame.getEpochCount(),
             batch_size=self.trainingFrame.getBatchSize(),
             validation_split=0.2,
-            callbacks=[checkpoint_cb, custom_callback]
+            callbacks=[checkpoint_cb, custom_callback],
+            verbose=0
         )
 
         self.trainingFrame.setTrainButtonText("Testing results...")
         self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(X_train, y_train)[1])
         self.modelInfoFrame.setTestAccuracy(self.model.evaluate(X_test, y_test)[1])
 
+        self.trainingFrame.setTrainButtonText("Creating confusion matrix...")
+        self.showConfusionMatrix(self.createConfusionMatrix())
+
+    def createConfusionMatrix(self):
+        X, y_encoded = self.prepareData()
+        X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+
+        # Standardize features by removing the mean and scaling to unit variance
+        scaler = StandardScaler(with_mean=False)
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+
+        if self.modelInfoFrame.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
+            y_pred = np.argmax(self.model.predict(X_test_scaled), axis=1)
+            cm = confusion_matrix(y_test.argmax(axis=1), y_pred, labels=np.unique(y_encoded.argmax(axis=1)))
+        elif self.modelInfoFrame.getLossFunctionName(self.model.loss) == "sparse_categorical_crossentropy":
+            y_pred = np.argmax(self.model.predict(X_test_scaled), axis=1)
+            cm = confusion_matrix(y_test, y_pred, labels=np.unique(y_encoded))
+        elif self.modelInfoFrame.getLossFunctionName(self.model.loss) == "binary_crossentropy":
+            y_pred_binary = (self.model.predict(X_test_scaled) > 0.5).astype(int)
+            cm = confusion_matrix(y_test, y_pred_binary)
+        else:
+            raise ValueError("Unsupported loss function")
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=self.dataSet.categories)
+
+        fig, ax = plt.subplots(figsize=(5, 4))
+        disp.plot(cmap='Blues', values_format=".2f", ax=ax)
+        fig.tight_layout()
+        img = self.fig2img(fig)
+        plt.close(fig)
+
+        return img
+
     def testAccuracy(self):
-        X_train, X_test, y_train, y_test = self.prepareData()
+        X, y_encoded = self.prepareData()
+        X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
         train_results = self.model.evaluate(X_train, y_train)
         test_results = self.model.evaluate(X_test, y_test)
         return [train_results[1], test_results[1]]
 
     def prepareData(self):
-        self.dataSet.features.fillna(0, inplace=True)  # Fill missing values with 0
-
-        X = self.dataSet.features.values  # Convert to NumPy array
-        y = self.dataSet.target.values.flatten()
+        self.dataSet.features.fillna(0, inplace=True)
 
         # Convert string labels to numerical labels using LabelEncoder for target column
         label_encoder = LabelEncoder()
-        y_encoded = label_encoder.fit_transform(y)
+        y_encoded = label_encoder.fit_transform(self.dataSet.target.values.flatten())
 
-        # Convert numerical labels to one-hot encoding
+        # Convert numerical labels to one-hot encoding if using categorical_crossentropy
         if self.modelInfoFrame.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
             y_encoded = to_categorical(y_encoded)
 
         # One-hot encode categorical columns in features
         categorical_columns = [i for i, dtype in enumerate(self.dataSet.features.dtypes) if dtype == 'object']
+        X = self.dataSet.features.values.copy()  # Copy to avoid modifying the original DataFrame
+
         for col in categorical_columns:
             label_encoder = LabelEncoder()
             X[:, col] = label_encoder.fit_transform(X[:, col].astype(str))
@@ -71,8 +116,7 @@ class MLPFrame(AbstractNetworkFrame):
         for col in numerical_columns:
             X[:, col] = scaler.fit_transform(X[:, col].reshape(-1, 1)).flatten()
 
-        # Split the data into training and testing sets
-        return train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+        return X, y_encoded
 
 
 class CustomMLPCallback(tf.keras.callbacks.Callback):

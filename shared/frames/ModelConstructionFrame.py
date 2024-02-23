@@ -84,8 +84,8 @@ class ModelConstructionFrame:
     def loadFromFile(self):
         def load():
             model = tensorflow.keras.models.load_model(self.modelFilePath)
-            self.loadButton.config(state="normal", text="Load from file")
             self.loadModel(model)
+            self.loadButton.config(state="normal", text="Load from file")
 
         self.loadButton.config(state="disabled", text="Loading...")
         threading.Thread(target=load).start()
