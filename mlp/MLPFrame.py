@@ -34,7 +34,7 @@ class MLPFrame(AbstractNetworkFrame):
         custom_callback = CustomMLPCallback(self, self.trainingFrame.getEpochCount())
 
         self.trainingFrame.setTrainingPhaseText(0)
-        self.model.fit(
+        self.model.getModel().fit(
             X_train_scaled,
             y_train,
             epochs=self.trainingFrame.getEpochCount(),
@@ -45,10 +45,10 @@ class MLPFrame(AbstractNetworkFrame):
         )
 
         self.trainingFrame.setTestingTrainData()
-        self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(X_train, y_train)[1])
+        self.modelInfoFrame.setTrainAccuracy(self.model.getModel().evaluate(X_train, y_train)[1])
 
         self.trainingFrame.setTestingTestData()
-        self.modelInfoFrame.setTestAccuracy(self.model.evaluate(X_test, y_test)[1])
+        self.modelInfoFrame.setTestAccuracy(self.model.getModel().evaluate(X_test, y_test)[1])
 
         self.trainingFrame.setCreatingConfusionMatrix()
         self.updateConfusionMatrix()
@@ -62,14 +62,14 @@ class MLPFrame(AbstractNetworkFrame):
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
 
-        if self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
-            y_pred = np.argmax(self.model.predict(X_test_scaled), axis=1)
+        if self.model.getLossFunction() == "Categorical Crossentropy":
+            y_pred = np.argmax(self.model.getModel().predict(X_test_scaled), axis=1)
             cm = confusion_matrix(y_test.argmax(axis=1), y_pred, labels=np.unique(y_encoded.argmax(axis=1)))
-        elif self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "sparse_categorical_crossentropy":
-            y_pred = np.argmax(self.model.predict(X_test_scaled), axis=1)
+        elif self.model.getLossFunction() == "Sparse Categorical Crossentropy":
+            y_pred = np.argmax(self.model.getModel().predict(X_test_scaled), axis=1)
             cm = confusion_matrix(y_test, y_pred, labels=np.unique(y_encoded))
-        elif self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "binary_crossentropy":
-            y_pred_binary = (self.model.predict(X_test_scaled) > 0.5).astype(int)
+        elif self.model.getLossFunction() == "Binary Crossentropy":
+            y_pred_binary = (self.model.getModel().predict(X_test_scaled) > 0.5).astype(int)
             cm = confusion_matrix(y_test, y_pred_binary)
         else:
             raise ValueError("Unsupported loss function")
@@ -78,8 +78,8 @@ class MLPFrame(AbstractNetworkFrame):
     def testAccuracy(self):
         X, y_encoded = self.prepareData()
         X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
-        train_results = self.model.evaluate(X_train, y_train, verbose=0)
-        test_results = self.model.evaluate(X_test, y_test, verbose=0)
+        train_results = self.model.getModel().evaluate(X_train, y_train, verbose=0)
+        test_results = self.model.getModel().evaluate(X_test, y_test, verbose=0)
         return [train_results[1], test_results[1]]
 
     def getLossFunctionName(self, lossFunction):
@@ -101,7 +101,7 @@ class MLPFrame(AbstractNetworkFrame):
         y_encoded = label_encoder.fit_transform(self.dataSet.target.values.flatten())
 
         # Convert numerical labels to one-hot encoding if using categorical_crossentropy
-        if self.getLossFunctionName(self.model.loss) == "categorical_crossentropy":
+        if self.model.getLossFunction() == "Categorical Crossentropy":
             y_encoded = to_categorical(y_encoded)
 
         # One-hot encode categorical columns in features

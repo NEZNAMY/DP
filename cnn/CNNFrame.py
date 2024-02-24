@@ -77,7 +77,7 @@ class CNNFrame(AbstractNetworkFrame):
             train_dir,
             target_size=IMAGE_SIZE,
             batch_size=BATCH_SIZE,
-            class_mode=self.modelInfoFrame.model.getLossFunctionClassMode(),
+            class_mode=self.model.getLossFunctionClassMode(),
             subset='validation',
             seed=seed_value
         )
@@ -86,14 +86,14 @@ class CNNFrame(AbstractNetworkFrame):
             train_dir,
             target_size=IMAGE_SIZE,
             batch_size=BATCH_SIZE,
-            class_mode=self.modelInfoFrame.model.getLossFunctionClassMode(),
+            class_mode=self.model.getLossFunctionClassMode(),
             subset='training',
             seed=seed_value
         )
 
         self.trainingFrame.setTrainingPhaseText(0)
 
-        self.model.fit(
+        self.model.getModel().fit(
             train_ds,
             validation_data=val_ds,
             epochs=self.trainingFrame.getEpochCount(),
@@ -101,10 +101,10 @@ class CNNFrame(AbstractNetworkFrame):
         )
 
         self.trainingFrame.setTestingTrainData()
-        self.modelInfoFrame.setTrainAccuracy(self.model.evaluate(train_ds)[1])
+        self.modelInfoFrame.setTrainAccuracy(self.model.getModel().evaluate(train_ds)[1])
 
         self.trainingFrame.setTestingTestData()
-        self.modelInfoFrame.setTestAccuracy(self.model.evaluate(self.prepareTestDataSet())[1])
+        self.modelInfoFrame.setTestAccuracy(self.model.getModel().evaluate(self.prepareTestDataSet())[1])
         # val_acc = self.model.evaluate(val_ds)[1]
 
         # Print confusion matrix
@@ -116,7 +116,7 @@ class CNNFrame(AbstractNetworkFrame):
             os.path.join(self.fullPath, 'test'),
             target_size=[self.network.getImageSize(), self.network.getImageSize()],
             batch_size=self.trainingFrame.getBatchSize(),
-            class_mode=self.modelInfoFrame.model.getLossFunctionClassMode(),
+            class_mode=self.model.getLossFunctionClassMode(),
             shuffle=False
         )
 
