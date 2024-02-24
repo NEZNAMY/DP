@@ -3,15 +3,15 @@ from tkinter import Frame, Label, Button, filedialog
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 import numpy as np
-from keras import Sequential
 
 from options import Options
+from shared import WrappedModel
 
 
 class ModelTestingFrame:
 
     def __init__(self, parentFrame: Frame, classIndexMapping: dict):
-        self.model = None
+        self.model: WrappedModel = None
         self.size = ()
         self.classIndexMapping = classIndexMapping
         self.frame = Frame(parentFrame)
@@ -34,7 +34,7 @@ class ModelTestingFrame:
     def getFrame(self):
         return self.frame
 
-    def loadModel(self, model: Sequential, imgSize: tuple):
+    def loadModel(self, model: WrappedModel, imgSize: tuple):
         if self.model is not None:
             self.hideLabels()
         self.model = model
@@ -48,15 +48,23 @@ class ModelTestingFrame:
             img_array = image.img_to_array(img)
             img_array = np.expand_dims(img_array, axis=0)
             img_array = preprocess_input(img_array)
-            predictions = self.model.predict(img_array)
-            sorted_indices = np.argsort(predictions[0])[::-1]  # Sort indices by probability
-
             self.showLabels()
 
-            for i in sorted_indices:
-                class_name = self.classIndexMapping[i]
-                probability = predictions[0][i] * 100
-                self.probabilityLabels[i].config(text=class_name + " - " + format(probability, ".2f") + "%")
+            if self.model.getLossFunction() == "Binary Crossentropy":
+                probabilities = self.model.getModel().predict(img_array)[0]
+                higherClass = 1 if probabilities[0] > 0.5 else 0
+                lowerClass = 1 - higherClass
+                self.probabilityLabels[higherClass].config(text=self.classIndexMapping[0] + " - " +
+                                                           format((1 - probabilities[0]) * 100, ".2f") + "%")
+                self.probabilityLabels[lowerClass].config(text=self.classIndexMapping[1] + " - " +
+                                                          format(probabilities[0] * 100, ".2f") + "%")
+            else:
+                predictions = self.model.getModel().predict(img_array)
+                sorted_indices = np.argsort(predictions[0])[::-1]  # Sort indices by probability
+                for i in sorted_indices:
+                    class_name = self.classIndexMapping[i]
+                    probability = predictions[0][i] * 100
+                    self.probabilityLabels[i].config(text=class_name + " - " + format(probability, ".2f") + "%")
 
             self.testButton.config(state="normal", text="Select image to test")
 

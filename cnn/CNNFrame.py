@@ -11,6 +11,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from cnn.ModelTestingFrame import ModelTestingFrame
 from cnn.types.AbstractCNN import AbstractCNN
+from shared import WrappedModel
 from shared.AbstractNetworkFrame import AbstractNetworkFrame
 
 
@@ -24,7 +25,7 @@ class CNNFrame(AbstractNetworkFrame):
         self.testingFrame = ModelTestingFrame(self.frame, classIndexMapping)
         self.testingFrame.getFrame().grid(row=2, column=2, sticky="wn", pady=15)
 
-    def loadModel(self, model, button: Button):
+    def loadModel(self, model: WrappedModel, button: Button):
         super().loadModel(model, button)
         self.testingFrame.loadModel(model, self.network.getImageSize())
 
@@ -122,8 +123,8 @@ class CNNFrame(AbstractNetworkFrame):
     def createConfusionMatrix(self):
         test_ds = self.prepareTestDataSet()
         class_indices = test_ds.class_indices
-        probabilities = self.model.predict(test_ds)
-        if self.modelInfoFrame.model.getLossFunctionName(self.model.loss) == "binary_crossentropy":
+        probabilities = self.model.getModel().predict(test_ds)
+        if self.model.getLossFunction() == "Binary Crossentropy":
             cm = confusion_matrix(test_ds.classes, (probabilities > 0.5).astype(int))
         else:
             cm = confusion_matrix(test_ds.classes, np.argmax(probabilities, axis=1), labels=list(class_indices.values()))

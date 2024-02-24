@@ -46,12 +46,12 @@ class AbstractNetworkFrame(ABC):
     def getFrame(self):
         return self.frame
 
-    def loadModel(self, model, button: Button):
+    def loadModel(self, model: WrappedModel, button: Button):
         self.model = model
         self.trainingFrame.enableTrainButton()
         self.trainingFrame.hideWarn()
         button.config(text="Phase 2/3: Testing model accuracy...")
-        self.modelInfoFrame.setModel(WrappedModel(model), self.testAccuracy())
+        self.modelInfoFrame.setModel(model, self.testAccuracy())
         button.config(text="Phase 3/3: Creating confusion matrix...")
         self.updateConfusionMatrix()
 

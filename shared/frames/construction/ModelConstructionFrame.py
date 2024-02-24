@@ -8,6 +8,7 @@ import tensorflow as tf
 
 from options import Options
 from shared import AbstractNetworkFrame
+from shared.WrappedModel import WrappedModel
 from shared.frames.construction.ModelLoadingFromFile import ModelLoadingFromFile
 
 
@@ -78,7 +79,7 @@ class ModelConstructionFrame:
                 loss=self.lossFunctionNames[self.lossFunctionBox.get()],
                 metrics=metrics
             )
-            self.loadModel(model, self.createButton)
+            self.loadModel(WrappedModel(model), self.createButton)
             self.createButton.config(state="normal", text="Create new")
 
         self.createButton.config(state="disabled", text="Phase 1/3: Constructing model...")

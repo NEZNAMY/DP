@@ -6,6 +6,7 @@ from tkinter import Frame, Label, Button
 from tensorflow.keras.models import load_model
 
 from options import Options
+from shared.WrappedModel import WrappedModel
 from shared.frames.construction import ModelConstructionFrame
 
 
@@ -36,7 +37,7 @@ class ModelLoadingFromFile:
         def load():
             self.loadButton.config(state="disabled", text="Phase 1/3: Loading model to memory...")
             model = load_model(self.modelFilePath)
-            self.modelConstruction.parent.loadModel(model, self.loadButton)
+            self.modelConstruction.parent.loadModel(WrappedModel(model), self.loadButton)
             self.loadButton.config(state="normal", text="Load from file")
             print("Loaded model from file in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
 
