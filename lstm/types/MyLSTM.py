@@ -1,5 +1,5 @@
 from keras import Sequential
-from keras.src.layers import *
+from keras.layers import *
 
 from shared.AbstractNetwork import AbstractNetwork
 

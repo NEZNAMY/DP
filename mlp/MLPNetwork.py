@@ -1,5 +1,5 @@
 from keras import Sequential
-from keras.src.layers import Dense, Dropout
+from keras.layers import Dense, Dropout
 
 from shared.AbstractNetwork import AbstractNetwork
 

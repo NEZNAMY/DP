@@ -1,4 +1,4 @@
-import keras
+import tensorflow
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, BatchNormalization, Dropout
 from tensorflow.keras.models import Sequential
 
@@ -8,8 +8,8 @@ from cnn.CNNFrame import *
 class Xception(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
-        base_model = keras.applications.Xception(weights='imagenet', include_top=False,
-                                                 input_shape=(self.getImageSize(), self.getImageSize(), 3))
+        base_model = tensorflow.keras.applications.Xception(
+            weights='imagenet', include_top=False, input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
         for layer in base_model.layers:
             layer.trainable = False

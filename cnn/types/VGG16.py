@@ -1,6 +1,6 @@
-import keras
+import tensorflow
 
-from keras.src.layers import *
+from keras.layers import *
 from tensorflow.keras import *
 
 from cnn.CNNFrame import *
@@ -9,7 +9,7 @@ from cnn.CNNFrame import *
 class VGG16(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
-        network = keras.applications.VGG16(weights='imagenet', include_top=False,
+        network = tensorflow.keras.applications.VGG16(weights='imagenet', include_top=False,
                                            input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
         for layer in network.layers:

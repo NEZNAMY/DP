@@ -1,4 +1,4 @@
-import keras
+import tensorflow
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Sequential
 
@@ -8,7 +8,7 @@ from cnn.types.AbstractCNN import AbstractCNN
 class DenseNet121(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
-        base_model = keras.applications.DenseNet121(
+        base_model = tensorflow.keras.applications.DenseNet121(
             include_top=False, weights='imagenet', input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
         for layer in base_model.layers:

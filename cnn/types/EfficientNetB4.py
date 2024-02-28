@@ -1,6 +1,6 @@
-import keras
+import tensorflow
 
-from keras.src.layers import *
+from keras.layers import *
 from tensorflow.keras import *
 
 from cnn.CNNFrame import *
@@ -9,8 +9,8 @@ from cnn.CNNFrame import *
 class EfficientNetB4(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
-        base_model = keras.applications.EfficientNetB4(weights='imagenet', include_top=False,
-                                                       input_shape=(self.getImageSize(), self.getImageSize(), 3))
+        base_model = tensorflow.keras.applications.EfficientNetB4(
+            weights='imagenet', include_top=False, input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
         for layer in base_model.layers:
             layer.trainable = False

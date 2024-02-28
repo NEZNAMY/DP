@@ -1,5 +1,5 @@
-import keras
-from keras.src.layers import *
+import tensorflow
+from keras.layers import *
 from tensorflow.keras import *
 
 from cnn.CNNFrame import *
@@ -8,7 +8,7 @@ from cnn.CNNFrame import *
 class InceptionV3(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
-        network = keras.applications.InceptionV3(include_top=False, weights="imagenet",
+        network = tensorflow.keras.applications.InceptionV3(include_top=False, weights="imagenet",
                                                  input_shape=(self.getImageSize(), self.getImageSize(), 3))
         for layer in network.layers:
             layer.trainable = False

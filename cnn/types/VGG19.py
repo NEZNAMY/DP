@@ -1,4 +1,4 @@
-import keras
+import tensorflow
 from tensorflow.keras.layers import Dense, Flatten, BatchNormalization, Dropout
 from tensorflow.keras.models import Sequential
 
@@ -8,7 +8,7 @@ from cnn.CNNFrame import *
 class VGG19(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
-        network = keras.applications.VGG19(weights='imagenet', include_top=False,
+        network = tensorflow.keras.applications.VGG19(weights='imagenet', include_top=False,
                                            input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
         for layer in network.layers:
