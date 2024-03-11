@@ -14,8 +14,8 @@ class DatasetMenu:
         base_dir = 'C:\\Users\\marti\\OneDrive\\Počítač\\škola\\DP\\datasety'
 
         start_time = time.time_ns()
-        dataset1 = CNNDataSet(tk, os.path.join(base_dir, 'Dataset_1_Parkinson_Spiral'),
-                              "Dataset 1 - Parkinson spiral drawing")
+        dataset1 = CNNDataSet(tk, os.path.join(base_dir, 'Dataset_1_Parkinson_Drawing'),
+                              "Dataset 1 - Parkinson drawing")
         print("Loaded dataset 1 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
 
         start_time = time.time_ns()
@@ -47,7 +47,7 @@ class DatasetMenu:
         dataset99 = LSTMDataSet(tk, os.path.join(base_dir, 'Dataset_99_Test'), "Dataset 99 - Test")
         print("Loaded dataset 99 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
 
-        self.addDataSet(dataset1, "Dataset 1 - Parkinson spiral drawing [CNN]")
+        self.addDataSet(dataset1, "Dataset 1 - Parkinson drawing [CNN]")
         self.menu.add_separator()
         self.addMLPDataSet(dataset2, "Dataset 2 - Alzheimer Features [MLP]")
         self.addMLPDataSet(dataset3, "Dataset 3 - Alzheimer Handwriting [MLP]")
