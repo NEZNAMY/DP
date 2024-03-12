@@ -10,7 +10,7 @@ class EfficientNetB4(AbstractCNN):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         base_model = tensorflow.keras.applications.EfficientNetB4(
-            weights='imagenet', include_top=False, input_shape=(self.getImageSize(), self.getImageSize(), 3))
+            include_top=False, weights='imagenet', input_shape=(self.getImageSize(), self.getImageSize(), 3))
 
         for layer in base_model.layers:
             layer.trainable = False
@@ -24,7 +24,7 @@ class EfficientNetB4(AbstractCNN):
             Dense(4096, activation='relu'),
             BatchNormalization(),
             Dropout(0.5),
-            Dense(outputLayerSize, activation='softmax')
+            Dense(outputLayerSize, activation=outputLayerActivation)
         ], name="efficientnet_cnn_model")
 
     def getName(self):
