@@ -35,7 +35,7 @@ class ModelLoadingFromFile:
 
     def loadFromFile(self):
         def load():
-            self.loadButton.config(state="disabled", text="Phase 1/3: Loading model to memory...")
+            self.loadButton.config(state="disabled", text="Phase 1/4: Loading model to memory...")
             model = load_model(self.modelFilePath)
             self.modelConstruction.parent.loadModel(WrappedModel(model), self.loadButton)
             self.loadButton.config(state="normal", text="Load from file")

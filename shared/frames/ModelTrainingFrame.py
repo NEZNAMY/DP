@@ -67,9 +67,6 @@ class ModelTrainingFrame:
         self.disableTrainButton()
         threading.Thread(target=train).start()
 
-    def setSplittingData(self):
-        self.setTrainButtonText("Phase 0/6: Splitting data into train/test")
-
     def setStartingPhaseText(self):
         self.setTrainButtonText("Phase 1/6: Starting...")
 

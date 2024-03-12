@@ -50,9 +50,11 @@ class AbstractNetworkFrame(ABC):
         self.model = model
         self.trainingFrame.enableTrainButton()
         self.trainingFrame.hideWarn()
-        button.config(text="Phase 2/3: Testing model accuracy...")
+        button.config(text="Phase 2/4: Splitting data to train/test...")
+        self.checkSplitData()
+        button.config(text="Phase 3/4: Testing model accuracy...")
         self.modelInfoFrame.setModel(model, self.testAccuracy())
-        button.config(text="Phase 3/3: Creating confusion matrix...")
+        button.config(text="Phase 4/4: Creating confusion matrix...")
         self.updateConfusionMatrix()
 
     def updateConfusionMatrix(self):
@@ -93,4 +95,7 @@ class AbstractNetworkFrame(ABC):
 
     @abstractmethod
     def testAccuracy(self):
+        pass
+
+    def checkSplitData(self):
         pass

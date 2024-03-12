@@ -30,14 +30,7 @@ class CNNFrame(AbstractNetworkFrame):
         self.testingFrame.loadModel(model, self.network.getImageSize())
 
     def train(self):
-
-        test_dir = os.path.join(self.fullPath, 'test')
         train_dir = os.path.join(self.fullPath, 'train')
-
-        if (not os.path.exists(train_dir)) or (not os.path.exists(test_dir)):
-            self.trainingFrame.setSplittingData()
-            self.splitData()
-
         self.trainingFrame.setStartingPhaseText()
         count = 0
         for subdir in sorted(os.listdir(train_dir)):
@@ -132,6 +125,13 @@ class CNNFrame(AbstractNetworkFrame):
 
     def testAccuracy(self):
         return [0, 0]  # TODO
+
+    def checkSplitData(self):
+        test_dir = os.path.join(self.fullPath, 'test')
+        train_dir = os.path.join(self.fullPath, 'train')
+
+        if (not os.path.exists(train_dir)) or (not os.path.exists(test_dir)):
+            self.splitData()
 
     def splitData(self):
         train_data_dir = os.path.join(self.fullPath, 'train')

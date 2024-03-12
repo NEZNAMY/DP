@@ -82,7 +82,7 @@ class ModelConstructionFrame:
             self.loadModel(WrappedModel(model), self.createButton)
             self.createButton.config(state="normal", text="Create new")
 
-        self.createButton.config(state="disabled", text="Phase 1/3: Constructing model...")
+        self.createButton.config(state="disabled", text="Phase 1/4: Constructing model...")
         threading.Thread(target=create).start()
 
     def disableButtons(self):
