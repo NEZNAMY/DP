@@ -75,14 +75,7 @@ class CNNFrame(AbstractNetworkFrame):
             seed=seed_value
         )
 
-        train_ds = train_datagen.flow_from_directory(
-            train_dir,
-            target_size=IMAGE_SIZE,
-            batch_size=BATCH_SIZE,
-            class_mode=self.model.getLossFunctionClassMode(),
-            subset='training',
-            seed=seed_value
-        )
+        train_ds = self.prepareTrainDataSet()
 
         self.trainingFrame.setTrainingPhaseText(0)
 
@@ -104,6 +97,30 @@ class CNNFrame(AbstractNetworkFrame):
         self.trainingFrame.setCreatingConfusionMatrix()
         self.updateConfusionMatrix()
 
+    def prepareTrainDataSet(self):
+        train_dir = os.path.join(self.fullPath, 'train')
+        IMAGE_SIZE = [self.network.getImageSize(), self.network.getImageSize()]
+        BATCH_SIZE = self.trainingFrame.getBatchSize()
+        seed_value = 1337
+
+        train_datagen = ImageDataGenerator(
+            rescale=1. / 255,
+            zoom_range=[.99, 1.01],
+            horizontal_flip=True,
+            fill_mode='constant',
+            validation_split=0.2,
+            data_format='channels_last'
+        )
+
+        return train_datagen.flow_from_directory(
+            train_dir,
+            target_size=IMAGE_SIZE,
+            batch_size=BATCH_SIZE,
+            class_mode=self.model.getLossFunctionClassMode(),
+            subset='training',
+            seed=seed_value
+        )
+
     def prepareTestDataSet(self):
         return ImageDataGenerator(rescale=1. / 255).flow_from_directory(
             os.path.join(self.fullPath, 'test'),
@@ -124,7 +141,9 @@ class CNNFrame(AbstractNetworkFrame):
         return ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(class_indices.keys()))
 
     def testAccuracy(self):
-        return [0, 0]  # TODO
+        trainResults = self.model.getModel().evaluate(self.prepareTrainDataSet())[1]
+        testResults = self.model.getModel().evaluate(self.prepareTestDataSet())[1]
+        return [trainResults, testResults]
 
     def checkSplitData(self):
         test_dir = os.path.join(self.fullPath, 'test')
