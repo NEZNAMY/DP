@@ -136,13 +136,13 @@ class MLPConstructionMenu:
         elif self.layerBox.get() == "Dropout":
             try:
                 f = float(display)
+                display = str(100*f) + "%"
                 if f <= 0 or f >= 1:
                     self.invalidLayerWarn.config(text="Dropout of of range (0-1): " + self.parameterEntry.get())
                     return
             except ValueError:
                 self.invalidLayerWarn.config(text="Invalid number for dropout: " + self.parameterEntry.get())
                 return
-            display += "%"
 
         self.invalidLayerWarn.config(text="")
         index = len(self.layers)
