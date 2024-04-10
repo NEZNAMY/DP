@@ -24,14 +24,14 @@ class DatasetMenu:
         print("Loaded dataset 2 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
 
         start_time = time.time_ns()
+        dataset3 = MLPDataSet(tk, os.path.join(base_dir, 'Dataset_3_Alzheimer_Handwriting'),
+                              "Dataset 3 - Alzheimer Handwriting")
+        print("Loaded dataset 3 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
+
+        start_time = time.time_ns()
         dataset102 = MLPDataSet(tk, os.path.join(base_dir, 'Dataset_102_Alzheimer_Features'),
                                 "Dataset 102 - Alzheimer Features")
         print("Loaded dataset 102 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
-
-        start_time = time.time_ns()
-        dataset103 = MLPDataSet(tk, os.path.join(base_dir, 'Dataset_103_Alzheimer_Handwriting'),
-                                "Dataset 103 - Alzheimer Handwriting")
-        print("Loaded dataset 103 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
 
         start_time = time.time_ns()
         dataset104 = MLPDataSet(tk, os.path.join(base_dir, 'Dataset_104_Alzheimer_Plasma'),
@@ -50,8 +50,8 @@ class DatasetMenu:
         self.addDataSet(dataset1, "Dataset 1 - Parkinson drawing [CNN]")
         self.menu.add_separator()
         self.addMLPDataSet(dataset2, "Dataset 2 - Parkinson Speech [MLP]")
+        self.addMLPDataSet(dataset3, "Dataset 3 - Alzheimer Handwriting [MLP]")
         self.addMLPDataSet(dataset102, "Dataset 102 - Alzheimer Features [MLP]")
-        self.addMLPDataSet(dataset103, "Dataset 103 - Alzheimer Handwriting [MLP]")
         self.addMLPDataSet(dataset104, "Dataset 104 - Alzheimer Plasma [MLP]")
         self.addMLPDataSet(dataset105, "Dataset 105 - Parkinson Features [MLP]")
 
