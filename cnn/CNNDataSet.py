@@ -5,7 +5,6 @@ from tkinter import *
 from cnn.CNNFrame import CNNFrame
 from cnn.CNNInfoFrame import CNNInfoFrame
 from cnn.types.DenseNet121 import DenseNet121
-from cnn.types.EfficientNetB4 import EfficientNetB4
 from cnn.types.InceptionV3 import InceptionV3
 from cnn.types.MobileNetV2 import MobileNetV2
 from cnn.types.ResNet50 import ResNet50
@@ -32,7 +31,6 @@ class CNNDataSet(AbstractDataSet):
                 os.path.isdir(os.path.join(self.fullPath, f)) and f not in ["train", "test"]]
 
     def loadNetworks(self):
-        for cnn in [DenseNet121(), EfficientNetB4(), InceptionV3(),
-                    MobileNetV2(), ResNet50(), VGG16(), VGG19(), Xception()]:
+        for cnn in [DenseNet121(), InceptionV3(), MobileNetV2(), ResNet50(), VGG16(), VGG19(), Xception()]:
             cnf = CNNFrame(self.trainingFrame, self.fullPath, self.classIndexMapping, cnn)
             self.networks.addNetwork(cnn.getName(), cnf.getFrame())
