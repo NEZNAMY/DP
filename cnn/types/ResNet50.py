@@ -15,6 +15,7 @@ class ResNet50(AbstractCNN):
 
         return Sequential([
             base_model,
+            Dropout(0.5),
             GlobalAveragePooling2D(),
             Flatten(),
             BatchNormalization(),
