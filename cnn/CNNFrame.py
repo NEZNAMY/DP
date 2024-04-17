@@ -42,14 +42,11 @@ class CNNFrame(AbstractNetworkFrame):
 
         total_batches = math.ceil(trainCount / self.trainingFrame.getBatchSize()) * self.trainingFrame.getEpochCount()
 
-        def exponential_decay(lr0, s):
-            def exponential_decay_fn(epoch):
-                return lr0 * 0.1 ** (epoch / s)
-
-            return exponential_decay_fn
+        def learningRate(epoch):
+            return 0.001
 
         # Callbacks
-        lr_scheduler = tf.keras.callbacks.LearningRateScheduler(exponential_decay(0.01, 20))
+        lr_scheduler = tf.keras.callbacks.LearningRateScheduler(learningRate)
         checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(self.modelFilePath, save_best_only=True)
         custom_callback = CustomCallback(self, total_batches)
 
