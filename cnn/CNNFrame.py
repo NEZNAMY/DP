@@ -76,7 +76,7 @@ class CNNFrame(AbstractNetworkFrame):
 
         self.trainingFrame.setTrainingPhaseText(0)
 
-        self.model.getModel().fit(
+        history = self.model.getModel().fit(
             train_ds,
             validation_data=val_ds,
             epochs=self.trainingFrame.getEpochCount(),
@@ -93,6 +93,7 @@ class CNNFrame(AbstractNetworkFrame):
         # Print confusion matrix
         self.trainingFrame.setCreatingConfusionMatrix()
         self.updateConfusionMatrix()
+        self.plotHistory(history)
 
     def prepareTrainDataSet(self):
         train_dir = os.path.join(self.fullPath, 'train')

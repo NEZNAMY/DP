@@ -34,7 +34,7 @@ class MLPFrame(AbstractNetworkFrame):
         custom_callback = CustomMLPCallback(self, self.trainingFrame.getEpochCount())
 
         self.trainingFrame.setTrainingPhaseText(0)
-        self.model.getModel().fit(
+        history = self.model.getModel().fit(
             X_train_scaled,
             y_train,
             epochs=self.trainingFrame.getEpochCount(),
@@ -52,6 +52,7 @@ class MLPFrame(AbstractNetworkFrame):
 
         self.trainingFrame.setCreatingConfusionMatrix()
         self.updateConfusionMatrix()
+        self.plotHistory(history)
 
     def createConfusionMatrix(self):
         X, y_encoded = self.prepareData()

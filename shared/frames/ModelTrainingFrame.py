@@ -32,6 +32,11 @@ class ModelTrainingFrame:
         self.warnLabel = Label(self.frame, text="Training is not available: No model is loaded", foreground="red")
         self.warnLabel.grid(row=5, column=0, columnspan=2)
 
+        self.history1 = Label(self.frame)
+        self.history1.grid(row=6, column=0, columnspan=99)
+        self.history2 = Label(self.frame)
+        self.history2.grid(row=7, column=0, columnspan=99)
+
     def getFrame(self):
         return self.frame
 

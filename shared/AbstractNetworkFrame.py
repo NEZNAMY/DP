@@ -72,7 +72,7 @@ class AbstractNetworkFrame(ABC):
         plt.title('Confusion Matrix')
 
         fig.tight_layout()
-        img = self.fig2img(fig)
+        img = ImageTk.PhotoImage(self.fig2img(fig))
         plt.close(fig)
         if img is None:
             return
@@ -82,8 +82,32 @@ class AbstractNetworkFrame(ABC):
         fig.canvas.draw()
         img_data = np.frombuffer(fig.canvas.get_renderer().buffer_rgba(), dtype=np.uint8)
         img_data = img_data.reshape(fig.canvas.get_width_height()[::-1] + (4,))
-        img = Image.fromarray(img_data, 'RGBA')
-        return ImageTk.PhotoImage(img)
+        return Image.fromarray(img_data, 'RGBA')
+
+    def plotHistory(self, history):
+        accuracy_fig = plt.figure()
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.title('Model accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        img2 = ImageTk.PhotoImage(self.fig2img(accuracy_fig).resize((600, 250), Image.LANCZOS))
+
+        self.trainingFrame.history1.img = img2
+        self.trainingFrame.history1.config(image=img2)
+
+        loss_fig = plt.figure()
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('Model loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        img1 = ImageTk.PhotoImage(self.fig2img(loss_fig).resize((600, 250), Image.LANCZOS))
+
+        self.trainingFrame.history2.img = img1
+        self.trainingFrame.history2.config(image=img1)
 
     @abstractmethod
     def createConfusionMatrix(self):
