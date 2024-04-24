@@ -83,17 +83,6 @@ class MLPFrame(AbstractNetworkFrame):
         test_results = self.model.getModel().evaluate(X_test, y_test, verbose=0)
         return [train_results[1], test_results[1]]
 
-    def getLossFunctionName(self, lossFunction):
-        if type(lossFunction) is str:
-            return lossFunction
-
-        try:
-            # MLP
-            return lossFunction.__name__
-        except AttributeError:
-            # CNN
-            return lossFunction.__class__.__name__
-
     def prepareData(self):
         self.dataSet.features.fillna(0, inplace=True)
 
