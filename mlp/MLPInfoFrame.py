@@ -41,7 +41,7 @@ class MLPInfoFrame:
         i = 2
         for name, values in string_values_dict.items():
             Label(self.featureFrame, text=name).grid(row=i, column=0)
-            Label(self.featureFrame, text="String", foreground="blue").grid(row=i, column=1)
+            Label(self.featureFrame, text="Categorical", foreground="blue").grid(row=i, column=1)
             Label(self.featureFrame, text=', '.join(sorted(values))).grid(row=i, column=2)
             i += 1
 
