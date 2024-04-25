@@ -1,7 +1,7 @@
 from tkinter import Frame
 
-import numpy as np
-import matplotlib.pyplot as plt
+import tensorflow as tf
+
 from lstm import LSTMDataSet
 from shared import AbstractNetwork
 from shared.AbstractNetworkFrame import AbstractNetworkFrame
@@ -14,27 +14,27 @@ class LSTMFrame(AbstractNetworkFrame):
         self.dataSet = dataSet
 
     def train(self):
-        self.model.compile(optimizer='adam', loss='mse')
-        self.model.fit(
+        self.model.getModel().fit(
             self.dataSet.dataX,
             self.dataSet.dataY,
             epochs=self.trainingFrame.getEpochCount(),
             batch_size=self.trainingFrame.getBatchSize(),
         )
 
-        # Generate predictions
-        x_test = np.linspace(10, 20, 50)
-        x_test = x_test.reshape((50, 1, 1))
-        y_pred = self.model.predict(x_test)
-
-        # Plot the results
-        plt.plot(self.dataSet.dataX[:, 0, 0], self.dataSet.dataY, label='Original Data')
-        plt.plot(x_test[:, 0, 0], y_pred, label='Predictions', linestyle='dashed')
-        plt.legend()
-        plt.show()
-
     def testAccuracy(self):
         return [0, 0]  # TODO
 
     def createConfusionMatrix(self):
         return None
+
+
+class CustomLSTMCallback(tf.keras.callbacks.Callback):
+
+    def __init__(self, anf: AbstractNetworkFrame, totalEpochs: int):
+        super(CustomLSTMCallback, self).__init__()
+        self.anf = anf
+        self.totalEpochs = totalEpochs
+
+    def on_epoch_end(self, epoch, logs=None):
+        percent = int((epoch + 1) / self.totalEpochs * 100)
+        self.anf.trainingFrame.setTrainingPhaseText(percent)

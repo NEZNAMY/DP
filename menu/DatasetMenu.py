@@ -1,6 +1,7 @@
 import time
 
 from cnn.CNNDataSet import *
+from lstm.LSTMDataSet import LSTMDataSet
 from mlp import MLPConstructionMenu
 from mlp.MLPDataSet import MLPDataSet
 
@@ -32,11 +33,18 @@ class DatasetMenu:
                               "Dataset 4 - Finger Tapping")
         print("Loaded dataset 4 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
 
+        start_time = time.time_ns()
+        dataset4_2 = LSTMDataSet(tk, os.path.join(base_dir, 'Dataset_4_Finger_Tapping'),
+                                 "Dataset 4 - Finger Tapping")
+        print("Loaded dataset 4 v2 in " + str(int((time.time_ns() - start_time) / 1000000)) + "ms")
+
         self.addDataSet(dataset1, "Dataset 1 - Parkinson drawing [CNN]")
         self.menu.add_separator()
         self.addMLPDataSet(dataset2, "Dataset 2 - Parkinson Speech [MLP]")
         self.addMLPDataSet(dataset3, "Dataset 3 - Alzheimer Handwriting [MLP]")
         self.addMLPDataSet(dataset4, "Dataset 4 - Finger Tapping [MLP]")
+        self.menu.add_separator()
+        self.addDataSet(dataset4_2, "Dataset 4 - Finger Tapping [LSTM]")
 
     def addMLPDataSet(self, dataSet: MLPDataSet, displayName: str):
         self.addDataSet(dataSet, displayName)
