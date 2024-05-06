@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 from lstm import LSTMDataSet
@@ -56,26 +56,15 @@ class LSTMFrame(AbstractNetworkFrame):
 
     def createConfusionMatrix(self):
         X, y_encoded = self.prepareData()
-        X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
-
-        X_train_reshaped = X_train.reshape(-1, X_train.shape[-1])
-        X_test_reshaped = X_test.reshape(-1, X_test.shape[-1])
-
-        scaler = StandardScaler(with_mean=False)
-        X_train_scaled = scaler.fit_transform(X_train_reshaped)
-        X_test_scaled = scaler.transform(X_test_reshaped)
-
-        X_train_scaled = X_train_scaled.reshape(X_train.shape)
-        X_test_scaled = X_test_scaled.reshape(X_test.shape)
+        x_train, x_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+        y_pred = np.argmax(self.model.getModel().predict(x_test), axis=1)
 
         if self.model.getLossFunction() == "Categorical Crossentropy":
-            y_pred = np.argmax(self.model.getModel().predict(X_test_scaled), axis=1)
             cm = confusion_matrix(y_test.argmax(axis=1), y_pred, labels=np.unique(y_encoded.argmax(axis=1)))
         elif self.model.getLossFunction() == "Sparse Categorical Crossentropy":
-            y_pred = np.argmax(self.model.getModel().predict(X_test_scaled), axis=1)
             cm = confusion_matrix(y_test, y_pred, labels=np.unique(y_encoded))
         elif self.model.getLossFunction() == "Binary Crossentropy":
-            y_pred_binary = (self.model.getModel().predict(X_test_scaled) > 0.5).astype(int)
+            y_pred_binary = (self.model.getModel().predict(x_test) > 0.5).astype(int)
             cm = confusion_matrix(y_test, y_pred_binary)
         else:
             raise ValueError("Unsupported loss function")
