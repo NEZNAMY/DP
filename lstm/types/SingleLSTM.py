@@ -8,7 +8,7 @@ class SingleLSTM(AbstractNetwork):
 
     def createNetwork(self, outputLayerSize: int, outputLayerActivation: str):
         return Sequential([
-            LSTM(64, activation='relu', input_shape=(None, None)),
+            LSTM(64, activation='relu', input_shape=(1997, 5)),
             Dense(outputLayerSize, activation=outputLayerActivation)
         ])
 
