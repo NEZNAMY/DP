@@ -20,12 +20,32 @@ class LSTMFrame(AbstractNetworkFrame):
         self.dataSet = dataSet
 
     def train(self):
-        self.model.getModel().fit(
-            self.dataSet.dataX,
-            self.dataSet.dataY,
+        self.trainingFrame.setStartingPhaseText()
+        data, labels = self.prepareData()
+        X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
+        checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(self.modelFilePath, save_best_only=True)
+        custom_callback = CustomLSTMCallback(self, self.trainingFrame.getEpochCount())
+
+        self.trainingFrame.setTrainingPhaseText(0)
+        history = self.model.getModel().fit(
+            X_train,
+            y_train,
             epochs=self.trainingFrame.getEpochCount(),
             batch_size=self.trainingFrame.getBatchSize(),
+            validation_split=0.2,
+            callbacks=[checkpoint_cb, custom_callback],
+            verbose=0
         )
+
+        self.trainingFrame.setTestingTrainData()
+        self.modelInfoFrame.setTrainAccuracy(self.model.getModel().evaluate(X_train, y_train)[1])
+
+        self.trainingFrame.setTestingTestData()
+        self.modelInfoFrame.setTestAccuracy(self.model.getModel().evaluate(X_test, y_test)[1])
+
+        self.trainingFrame.setCreatingConfusionMatrix()
+        self.updateConfusionMatrix()
+        self.plotHistory(history)
 
     def testAccuracy(self):
         data, labels = self.prepareData()
