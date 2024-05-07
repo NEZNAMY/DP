@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
+from tensorflow.keras.utils import to_categorical
 from lstm import LSTMDataSet
 from shared import AbstractNetwork
 from shared.AbstractNetworkFrame import AbstractNetworkFrame
@@ -55,14 +55,14 @@ class LSTMFrame(AbstractNetworkFrame):
         return [train_results[1], test_results[1]]
 
     def createConfusionMatrix(self):
-        X, y_encoded = self.prepareData()
-        x_train, x_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+        data, labels = self.prepareData()
+        x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
         y_pred = np.argmax(self.model.getModel().predict(x_test), axis=1)
 
         if self.model.getLossFunction() == "Categorical Crossentropy":
-            cm = confusion_matrix(y_test.argmax(axis=1), y_pred, labels=np.unique(y_encoded.argmax(axis=1)))
+            cm = confusion_matrix(y_test.argmax(axis=1), y_pred, labels=np.unique(labels.argmax(axis=1)))
         elif self.model.getLossFunction() == "Sparse Categorical Crossentropy":
-            cm = confusion_matrix(y_test, y_pred, labels=np.unique(y_encoded))
+            cm = confusion_matrix(y_test, y_pred, labels=np.unique(labels))
         elif self.model.getLossFunction() == "Binary Crossentropy":
             y_pred_binary = (self.model.getModel().predict(x_test) > 0.5).astype(int)
             cm = confusion_matrix(y_test, y_pred_binary)
@@ -87,7 +87,10 @@ class LSTMFrame(AbstractNetworkFrame):
                     measurement = pad_sequences([measurement], maxlen=1997, dtype='float32', padding='post')[0]
                     data.append(measurement)
                     labels.append(folder)  # Use folder name as label
-        return np.array(data), LabelEncoder().fit_transform(np.array(labels))
+        labels2 = LabelEncoder().fit_transform(np.array(labels))
+        if self.model.getLossFunction() == "Categorical Crossentropy":
+            labels2 = to_categorical(labels2)
+        return np.array(data), labels2
 
 
 class CustomLSTMCallback(tf.keras.callbacks.Callback):
