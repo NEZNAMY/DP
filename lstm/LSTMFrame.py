@@ -80,12 +80,16 @@ class LSTMFrame(AbstractNetworkFrame):
                     filepath = os.path.join(folder_full_path, filename)
                     with open(filepath, 'r') as file:
                         lines = file.readlines()
-                    measurement = []
+                    measurements = []
                     for line in lines:
-                        values = [float(val.strip()) for val in line.split(',')[1:]]  # Exclude the first column (time)
-                        measurement.append(values)
-                    measurement = pad_sequences([measurement], maxlen=1997, dtype='float32', padding='post')[0]
-                    data.append(measurement)
+                        values = [float(val.strip()) for val in line.split(',')]
+                        measurements.append(values)
+                    measurements = np.array(measurements)
+                    max_values = np.max(np.abs(measurements), axis=0)
+                    measurements_normalized = measurements / max_values
+                    measurements_padded = \
+                    pad_sequences([measurements_normalized], maxlen=1997, dtype='float32', padding='post')[0]
+                    data.append(measurements_padded)
                     labels.append(folder)  # Use folder name as label
         labels2 = LabelEncoder().fit_transform(np.array(labels))
         if self.model.getLossFunction() == "Categorical Crossentropy":
