@@ -1,4 +1,70 @@
 {
   "showFrameBorders": true,
-  "MLPs": []
+  "MLPs": [
+    {
+      "Name": "Dense 64",
+      "Layers": [
+        {
+          "LayerType": "Dense",
+          "Parameter": "64",
+          "ActivationFunction": "relu"
+        }
+      ]
+    },
+    {
+      "Name": "Dense 32 + Dropout 30% + Dense 32",
+      "Layers": [
+        {
+          "LayerType": "Dense",
+          "Parameter": "32",
+          "ActivationFunction": "relu"
+        },
+        {
+          "LayerType": "Dropout",
+          "Parameter": "0.3",
+          "ActivationFunction": "relu"
+        },
+        {
+          "LayerType": "Dense",
+          "Parameter": "32",
+          "ActivationFunction": "relu"
+        }
+      ]
+    },
+    {
+      "Name": "Dense 256 + Dense 256",
+      "Layers": [
+        {
+          "LayerType": "Dense",
+          "Parameter": "256",
+          "ActivationFunction": "relu"
+        },
+        {
+          "LayerType": "Dense",
+          "Parameter": "256",
+          "ActivationFunction": "relu"
+        }
+      ]
+    },
+    {
+      "Name": "Dense 512 + Dropout 50% + Dense 256",
+      "Layers": [
+        {
+          "LayerType": "Dense",
+          "Parameter": "512",
+          "ActivationFunction": "relu"
+        },
+        {
+          "LayerType": "Dropout",
+          "Parameter": "0.5",
+          "ActivationFunction": "relu"
+        },
+        {
+          "LayerType": "Dense",
+          "Parameter": "256",
+          "ActivationFunction": "relu"
+        }
+      ]
+    }
+  ]
 }
