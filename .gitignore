@@ -3,3 +3,7 @@
 /workspace.xml
 .networks/
 .idea/
+/datasety/Dataset_1_Parkinson_Drawing/Healthy/
+/datasety/Dataset_1_Parkinson_Drawing/Parkinson/
+/datasety/Dataset_1_Parkinson_Drawing/test/
+/datasety/Dataset_1_Parkinson_Drawing/train/
