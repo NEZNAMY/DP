@@ -11,7 +11,7 @@ class DatasetMenu:
     def __init__(self, tk: Tk, menuBar: Menu):
         self.currentFrame = None
         self.menu = Menu(menuBar, tearoff=0)
-        base_dir = 'C:\\Users\\marti\\OneDrive\\Počítač\\škola\\DP\\datasety'
+        base_dir = 'datasety'
 
         start_time = time.time_ns()
         dataset1 = CNNDataSet(tk, os.path.join(base_dir, 'Dataset_1_Parkinson_Drawing'),
